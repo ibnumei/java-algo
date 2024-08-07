@@ -1,0 +1,100 @@
+
+
+A financial service companny needs to price a numer of zero-coupon bonds base on a 5% yiel. A zero-coupon bond
+accures interest until maturity , then the principal and interest are paid at once. Create a query that computes
+the present value of expected cash flows for each investor using a constant discount rate of 5% per period.
+
+The required output should list all investors with their total number of investments,
+the sum of the present values of ther expected cash flows at maturnity,
+and the average of the present values of the expected cash flows at maturity.
+
+the result should have the following columns:
+email | investment_count | total_present_value | avg_present_value,
+    - email - investor email,
+    - invesment_count = total number of invesments held by a specific investor,
+    - total_present_value = sum of the present values of expected cash flows for a specific investor, rounded to two decimal places,
+    - avg_present_value = an average of the present value of the expected cash flows for a specific investor, rounded two decimal places.
+
+The result should be sorted in asc order by email.
+
+Schema table investor:
+    field id int, email varchar.
+table cash_flows:
+    field investor_id int reference to the investor table, expected_flow decimal(8,2), cash_flow_period int.
+
+note -
+    - to calculate the present value use formula present_value = expected_flow / (1+discount_rate).
+    - use a discount_rate of 0.05 and assume each cash flow has a different period ranging from1 to the number of cash flows per investor.
+    - trailing zeros after the decimal should be omitted,
+    - only investor who have a sum a present values greater than 1.000.000 should be included the result
+
+=====================================================================================
+ SELECT
+     i.email,
+     COUNT(cf.investor_id) AS investment_count,
+     ROUND(SUM(cf.expected_flow / POWER(1 + 0.05, cf.cash_flow_period)), 2) AS total_present_value,
+     ROUND(AVG(cf.expected_flow / POWER(1 + 0.05, cf.cash_flow_period)), 2) AS avg_present_value
+ FROM
+     investor i
+ JOIN
+     cash_flows cf ON i.id = cf.investor_id
+ GROUP BY
+     i.email
+ HAVING
+     total_present_value > 1000000
+ ORDER BY
+     i.email;
+=====================================================================================
+Query SQL yang menggabungkan tabel investor dan cash_flows, menghitung nilai sekarang (present value) dari arus kas yang diharapkan (expected cash flows), dan mengelompokkan hasil berdasarkan investor.
+
+Berikut adalah langkah-langkah untuk membangun query tersebut:
+
+1. Menghitung Present Value: Menggunakan formula present_value = expected_flow / (1 + discount_rate) ^ cash_flow_period.
+2. Mengelompokkan Berdasarkan Investor: Menggunakan GROUP BY untuk menghitung jumlah investasi (investment_count), total present value (total_present_value), dan rata-rata present value (avg_present_value) untuk setiap investor.
+3. Filter Investor: Hanya menyertakan investor yang memiliki total_present_value lebih besar dari 1.000.000.
+4. Pengurutan Berdasarkan Email: Mengurutkan hasil berdasarkan email secara ascending.
+=====================================================================================
+
+Penjelasan Kode
+1. Menghitung Present Value:
+    - cf.expected_flow / POWER(1 + 0.05, cf.cash_flow_period): Menghitung nilai sekarang dari setiap arus kas yang diharapkan dengan menggunakan formula diskonto yang diberikan.
+
+2. Menghitung dan Mengelompokkan:
+
+    - COUNT(cf.investor_id) AS investment_count: Menghitung jumlah investasi untuk setiap investor.
+    - ROUND(SUM(cf.expected_flow / POWER(1 + 0.05, cf.cash_flow_period)), 2) AS total_present_value: Menghitung total present value dari semua arus kas yang diharapkan untuk setiap investor dan membulatkannya ke dua desimal.
+    - ROUND(AVG(cf.expected_flow / POWER(1 + 0.05, cf.cash_flow_period)), 2) AS avg_present_value: Menghitung rata-rata present value dari semua arus kas yang diharapkan untuk setiap investor dan membulatkannya ke dua desimal.
+
+3. Filter Investor:
+
+    - HAVING total_present_value > 1000000: Hanya menyertakan investor yang memiliki total present value lebih besar dari 1.000.000.
+
+4. Pengurutan Berdasarkan Email:
+
+    - ORDER BY i.email: Mengurutkan hasil berdasarkan email investor secara ascending.
+
+Contoh Data
+Untuk memastikan query ini berfungsi dengan baik, berikut adalah contoh data:
+
+Tabel investor:
+
+id	email
+1	investor1@mail.com
+2	investor2@mail.com
+3	investor3@mail.com
+
+Tabel cash_flows:
+
+investor_id	expected_flow	cash_flow_period
+1	500000	1
+1	600000	2
+2	800000	1
+2	200000	2
+3	1500000	1
+3	500000	3
+
+Dengan contoh data ini, query akan menghasilkan hasil untuk investor dengan total_present_value lebih dari 1.000.000
+dan menampilkan informasi sesuai dengan format yang diminta.
+
+
+
