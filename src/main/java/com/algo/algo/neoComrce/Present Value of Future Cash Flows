@@ -29,6 +29,7 @@ note -
     - only investor who have a sum a present values greater than 1.000.000 should be included the result
 
 =====================================================================================
+POWER = hitung pangkat
  SELECT
      i.email,
      COUNT(cf.investor_id) AS investment_count,
